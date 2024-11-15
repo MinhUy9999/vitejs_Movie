@@ -15,6 +15,7 @@ axiosInstance.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Token added to request:", config.headers.Authorization);
     }
     return config;
   },
@@ -148,20 +149,114 @@ export const fetchTheaters = async () => {
     throw new Error('Could not fetch theaters. Please try again later.');
   }
 };
+// Create a new theater
+// Create a new theater
+export const createTheater = async (theaterData) => {
+  try {
+    const response = await axiosInstance.post('/theater/', theaterData);
+    if (!response.data) {
+      throw new Error('Failed to create theater');
+    }
+    console.log('Theater created:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating theater:', error.response?.data || error.message);
+    throw error.response?.data?.error || 'Failed to create theater. Please check your permissions and try again.';
+  }
+};
+
+// Update a theater by ID
+export const updateTheater = async (theaterID, theaterData) => {
+  try {
+    const response = await axiosInstance.put(`/theater/${theaterID}`, theaterData);
+    if (!response.data) {
+      throw new Error('Failed to update theater');
+    }
+    console.log('Theater updated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating theater:', error.response?.data || error.message);
+    throw error.response?.data?.error || 'Failed to update theater. Please check your permissions and try again.';
+  }
+};
+
+// Delete a theater by ID
+export const deleteTheater = async (theaterID) => {
+  try {
+    const response = await axiosInstance.delete(`/theater/${theaterID}`);
+    if (!response.data) {
+      throw new Error('Failed to delete theater');
+    }
+    console.log('Theater deleted:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting theater:', error.response?.data || error.message);
+    throw error.response?.data?.error || 'Failed to delete theater. Please check your permissions and try again.';
+  }
+};
+
 
 // Fetch rooms by theater ID
+// apiService.js
 export const fetchRoomsByTheaterID = async (theaterID) => {
   try {
     const response = await axiosInstance.get(`/room/${theaterID}`);
     if (!response.data || !response.data.rooms) {
       throw new Error('Failed to fetch rooms');
     }
-    return response.data;
+    return response.data.rooms; // Return only rooms array
   } catch (error) {
     console.error('Error fetching rooms:', error);
     throw new Error('Could not fetch rooms. Please try again later.');
   }
 };
+// apiService.js
+
+// Fetch all rooms
+export const fetchAllRooms = async () => {
+  try {
+    const response = await axiosInstance.get('/room/');
+    return response.data.rooms; // Returns the list of rooms
+  } catch (error) {
+    console.error('Error fetching all rooms:', error);
+    throw new Error('Could not fetch rooms.');
+  }
+};
+
+// Create a new room
+export const createRoom = async (roomData) => {
+  try {
+    const response = await axiosInstance.post('/room/', roomData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating room:', error);
+    throw error;
+  }
+};
+
+// Update a room by ID
+export const updateRoom = async (roomID, roomData) => {
+  try {
+    const response = await axiosInstance.put(`/room/${roomID}`, roomData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating room:', error);
+    throw error;
+  }
+};
+
+// Delete a room by ID
+export const deleteRoom = async (roomID) => {
+  try {
+    const response = await axiosInstance.delete(`/room/${roomID}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting room:', error);
+    throw error;
+  }
+};
+
+
 
 // Fetch screens by room ID
 export const fetchScreensByRoomID = async (roomID) => {
@@ -176,7 +271,61 @@ export const fetchScreensByRoomID = async (roomID) => {
     throw new Error('Could not fetch screens. Please try again later.');
   }
 };
+// Fetch all screens
+export const fetchAllScreens = async () => {
+  try {
+    const response = await axiosInstance.get('/screen/');
+    if (!response.data || !response.data.screens) {
+      throw new Error('Failed to fetch screens');
+    }
+    return response.data.screens;
+  } catch (error) {
+    console.error('Error fetching all screens:', error);
+    throw new Error('Could not fetch screens. Please try again later.');
+  }
+};
 
+// Create a new screen
+export const createScreen = async (screenData) => {
+  try {
+    const response = await axiosInstance.post('/screen/', screenData);
+    if (!response.data) {
+      throw new Error('Failed to create screen');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error creating screen:', error);
+    throw error;
+  }
+};
+
+// Update a screen by ID
+export const updateScreen = async (screenID, screenData) => {
+  try {
+    const response = await axiosInstance.put(`/screen/${screenID}`, screenData);
+    if (!response.data) {
+      throw new Error('Failed to update screen');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error updating screen:', error);
+    throw error;
+  }
+};
+
+// Delete a screen by ID
+export const deleteScreen = async (screenID) => {
+  try {
+    const response = await axiosInstance.delete(`/screen/${screenID}`);
+    if (!response.data) {
+      throw new Error('Failed to delete screen');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting screen:', error);
+    throw error;
+  }
+};
 // Fetch seats by screen ID
 export const fetchSeatsByScreenID = async (screenID) => {
   try {
@@ -190,7 +339,59 @@ export const fetchSeatsByScreenID = async (screenID) => {
     throw new Error('Could not fetch seats. Please try again later.');
   }
 };
+export const fetchAllSeats = async () => {
+  try {
+    const response = await axiosInstance.get('/seats/');
+    if (!response.data) {
+      throw new Error('Failed to fetch seats');
+    }
+    return response.data.seats;
+  } catch (error) {
+    console.error('Error fetching seats:', error);
+    throw new Error('Could not fetch seats. Please try again later.');
+  }
+};
+// Create a new seat
+export const createSeat = async (seatData) => {
+  try {
+    const response = await axiosInstance.post('/seats/', seatData);
+    if (!response.data) {
+      throw new Error('Failed to create seat');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error creating seat:', error);
+    throw error;
+  }
+};
 
+// Update a seat by ID
+export const updateSeat = async (seatID, seatData) => {
+  try {
+    const response = await axiosInstance.put(`/seats/${seatID}`, seatData);
+    if (!response.data) {
+      throw new Error('Failed to update seat');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error updating seat:', error);
+    throw error;
+  }
+};
+
+// Delete a seat by ID
+export const deleteSeat = async (seatID) => {
+  try {
+    const response = await axiosInstance.delete(`/seats/${seatID}`);
+    if (!response.data) {
+      throw new Error('Failed to delete seat');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting seat:', error);
+    throw error;
+  }
+};
 // Fetch schedules by screen ID
 export const fetchSchedulesByScreenID = async (screenID) => {
   try {
@@ -219,6 +420,59 @@ export const fetchScheduleByID = async (scheduleID) => {
   }
 };
 
+export const fetchAllSchedules = async () => {
+  try {
+    const response = await axiosInstance.get('/schedule/');
+    if (!response.data) {
+      throw new Error('Failed to fetch schedules');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching schedules:', error);
+    throw new Error('Could not fetch schedules. Please try again later.');
+  }
+};
+// Create a new schedule
+export const createSchedule = async (scheduleData) => {
+  try {
+    const response = await axiosInstance.post('/schedule/', scheduleData);
+    if (!response.data) {
+      throw new Error('Failed to create schedule');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error creating schedule:', error);
+    throw error;
+  }
+};
+
+// Update a schedule by ID
+export const updateSchedule = async (scheduleID, scheduleData) => {
+  try {
+    const response = await axiosInstance.put(`/schedule/${scheduleID}`, scheduleData);
+    if (!response.data) {
+      throw new Error('Failed to update schedule');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error updating schedule:', error);
+    throw error;
+  }
+};
+
+// Delete a schedule by ID
+export const deleteSchedule = async (scheduleID) => {
+  try {
+    const response = await axiosInstance.delete(`/schedule/${scheduleID}`);
+    if (!response.data) {
+      throw new Error('Failed to delete schedule');
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting schedule:', error);
+    throw error;
+  }
+};
 // Book tickets
 export const bookTickets = async (scheduleID, seats) => {
   try {
@@ -232,6 +486,38 @@ export const bookTickets = async (scheduleID, seats) => {
     throw error.response?.data || error;
   }
 };
+// Fetch bookings by user ID
+export const fetchBookingsByUserID = async (userID) => {
+  try {
+    const response = await axiosInstance.get(`user/bookings/${userID}`);
+    console.log('Response from /bookings/:userID:', response.data); // Log server response for debugging
+
+    if (!response.data || !response.data.bookings) {
+      throw new Error('Failed to fetch bookings');
+    }
+
+    return response.data.bookings;
+  } catch (error) {
+    console.error('Error fetching bookings:', error.response?.data || error.message);
+    throw new Error('Could not fetch bookings. Please try again later.');
+  }
+};
+// Fetch all bookings (Admin only)
+export const fetchAllBookings = async () => {
+  try {
+    const response = await axiosInstance.get('/user/bookings');
+    console.log('Fetched all bookings:', response.data); // Debug log
+    if (!response.data || !response.data.bookings) {
+      throw new Error('Failed to fetch bookings');
+    }
+    return response.data.bookings;
+  } catch (error) {
+    console.error('Error fetching all bookings:', error.response?.data || error.message);
+    throw new Error('Could not fetch bookings. Please try again later.');
+  }
+};
+
+
 // Hàm để xử lý thanh toán
 export const processPayment = async (bookingId, amount) => {
   const token = localStorage.getItem('token');
@@ -246,29 +532,41 @@ export const processPayment = async (bookingId, amount) => {
   });
   return response.data;
 };
-// Lấy danh sách vé theo booking ID
-export const getTicketsByBookingID = async (bookingID) => {
+
+
+// Fetch all users (Admin only)
+export const fetchAllUsers = async () => {
   try {
-      console.log("Fetching tickets for booking ID:", bookingID);
-      const response = await axiosInstance.get(`/tickets/booking/${bookingID}`);
-      console.log("Tickets fetched successfully:", response.data);
-      return response.data.tickets;
+    const response = await axiosInstance.get('/admin/users');
+    return response.data.users;
   } catch (error) {
-      console.error("Error fetching tickets:", error.response ? error.response.data : error.message);
-      throw error;
+    console.error('Error fetching users:', error);
+    throw error;
   }
 };
 
-// Tạo vé mới
-export const createTicket = async (ticketData) => {
+// Delete user by ID (Admin only)
+export const deleteUserByID = async (userID) => {
   try {
-      console.log("Creating a new ticket with data:", ticketData);
-      const response = await axiosInstance.post(`/tickets`, ticketData);
-      console.log("Ticket created successfully:", response.data);
-      return response.data;
+    const response = await axiosInstance.delete(`/admin/delete/${userID}`);
+    return response.data;
   } catch (error) {
-      console.error("Error creating ticket:", error.response ? error.response.data : error.message);
-      throw error;
+    console.error('Error deleting user:', error);
+    throw error;
   }
 };
+
+// Update user details by ID (Admin only)
+export const updateUserByID = async (userID, userData) => {
+  try {
+    const response = await axiosInstance.put(`/admin/update/${userID}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+};
+
+
+
 

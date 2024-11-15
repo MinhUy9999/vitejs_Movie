@@ -1,73 +1,70 @@
-// components/PaymentPage.jsx
 import React, { useEffect, useState } from 'react';
-import { getTicketsByBookingID } from '../services/apiService';
+import { fetchBookingsByUserID } from '../services/apiService';
 
 const PaymentPage = () => {
-  const [tickets, setTickets] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Lấy bookingID từ localStorage
-    const bookingID = localStorage.getItem('bookingID');
-    
+    const fetchAllBookingsForUser = async () => {
+      const userID = localStorage.getItem('userID');
+      if (!userID) {
+        setError('Không tìm thấy User ID.');
+        setLoading(false);
+        return;
+      }
 
-    if (bookingID) {
-      // Gọi API lấy danh sách vé
-      getTicketsByBookingID(bookingID)
-        .then((data) => {
-          // Kiểm tra và gán dữ liệu vé nếu có
-          setTickets(data || []);
-        })
-        .catch((error) => {
-          console.error("Error fetching tickets:", error);
-          setError('Không thể tải danh sách vé.');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setError('Không tìm thấy booking ID.');
-      setLoading(false);
-    }
+      try {
+        const userBookings = await fetchBookingsByUserID(userID);
+        
+        if (userBookings.length === 0) {
+          setError('Không có vé nào được tìm thấy cho người dùng này.');
+          return;
+        }
 
-    // Xóa trạng thái bookingComplete khỏi localStorage nếu cần
-    return () => {
-      localStorage.removeItem('bookingComplete');
+        setBookings(userBookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        setError(error.message || 'Không thể tải danh sách vé.');
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchAllBookingsForUser();
   }, []);
 
   if (loading) {
-    return <div>Đang tải dữ liệu...</div>;
+    return <div className="text-center text-lg py-4">Đang tải dữ liệu...</div>;
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-center text-lg text-red-500 py-4">{error}</div>;
   }
 
   return (
-    <div className="w-full max-w-md mx-auto my-5 p-4">
-      <h2 className="text-2xl font-bold text-center mb-4">Trang Thanh Toán</h2>
-      <p>Cảm ơn bạn đã đặt vé thành công. Dưới đây là thông tin vé của bạn:</p>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Tất Cả Vé Đã Đặt</h2>
+        <p className="text-center text-gray-700 mb-8">Dưới đây là danh sách tất cả các vé mà bạn đã đặt:</p>
 
-      {tickets.length > 0 ? (
-        <ul className="mt-4">
-          {tickets.map((ticket) => (
-            <li key={ticket.ticketID} className="border-b py-2">
-              <p><strong>Mã vé:</strong> {ticket.ticketID}</p>
-              <p><strong>Mã booking:</strong> {ticket.bookingID}</p>
-              <p><strong>Mã ghế:</strong> {ticket.seatID}</p>
-              <p><strong>Giá vé:</strong> {ticket.fare.toLocaleString('vi-VN')} VND</p>
-              <p><strong>Ngày phát hành:</strong> {new Date(ticket.issuedAt).toLocaleString('vi-VN')}</p>
-              {ticket.qrCode && (
-                <p><strong>QR Code:</strong> {ticket.qrCode}</p>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Không có vé nào được tìm thấy cho booking này.</p>
-      )}
+        {bookings.length > 0 ? (
+          <div className="space-y-4">
+            {bookings.map((booking) => (
+              <div key={booking.booking_id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold text-indigo-700 mb-2">Mã Booking: {booking.booking_id}</h3>
+                <p><strong>Mã Phim:</strong> {booking.movie_id}</p>
+                <p><strong>Ngày Đặt:</strong> {new Date(booking.booking_date).toLocaleString('vi-VN')}</p>
+                <p><strong>Số Ghế Đã Đặt:</strong> {booking.seats_booked}</p>
+                <p><strong>Danh Sách Ghế:</strong> {booking.seat_ids.join(', ')}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-700">Không có vé nào được tìm thấy cho booking này.</p>
+        )}
+      </div>
     </div>
   );
 };

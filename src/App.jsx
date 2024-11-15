@@ -10,6 +10,16 @@ import MovieDetail from './components/MovieDetail';
 import TheaterList from './components/TheaterList';
 import SeatPage from './components/SeatPage';
 import PaymentPage from './components/PaymentPage';
+import UserManagement from './pages/UserManagement';
+import MovieManagement from './pages/MovieManagement';
+import TheaterManagement from './pages/TheaterManagement';
+import RoomManagement from './pages/RoomManagement';
+import ScreenManagement from './pages/ScreenManagement';
+import ScheduleManagement from './pages/ScheduleManagement';
+import BookingManagement from './pages/BookingManagement';
+import SeatManagement from './pages/SeatManagement';
+
+
 
 
 function App() {
@@ -37,8 +47,21 @@ function App() {
                 <AdminDashboard />
               </PrivateRoute>
             }
-          />
-          
+          >
+            {/* Nested route for User Management inside AdminDashboard */}
+            <Route path="users" element={<UserManagement />} />
+            <Route path="movie" element={<MovieManagement />} />
+            <Route path="theater" element={<TheaterManagement />} />
+            <Route path="room" element={<RoomManagement />} />
+            <Route path="screen" element={<ScreenManagement />} />
+            <Route path="schedule" element={<ScheduleManagement />} />
+            <Route path="schedule" element={<ScheduleManagement />} />
+            <Route path="seat" element={<SeatManagement />} />
+            <Route path="booking" element={<BookingManagement />} />
+          </Route>
+    
+      
+
           <Route path="/movies/:movieId" element={<MovieDetail />} />
           <Route path="/theaters/:movieId" element={<TheaterList />} />
           <Route path="/seats/:screenId/:scheduleId" element={<SeatPage />} />

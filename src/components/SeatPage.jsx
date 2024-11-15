@@ -1,7 +1,7 @@
 // components/SeatPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchSeatsByScreenID, bookTickets, fetchScheduleByID, createTicket } from '../services/apiService';
+import { fetchSeatsByScreenID, bookTickets, fetchScheduleByID, fetchBookingsByUserID} from '../services/apiService';
 
 const SeatPage = () => {
   const { screenId, scheduleId } = useParams();
@@ -33,38 +33,43 @@ const SeatPage = () => {
   }, [screenId, scheduleId]);
 
   const handleSeatChange = (seatId) => {
-    if (selectedSeats.includes(seatId)) {
-      setSelectedSeats(selectedSeats.filter(id => id !== seatId));
-    } else {
-      setSelectedSeats([...selectedSeats, seatId]);
+    setSelectedSeats((prevSelectedSeats) => 
+      prevSelectedSeats.includes(seatId)
+        ? prevSelectedSeats.filter(id => id !== seatId)
+        : [...prevSelectedSeats, seatId]
+    );
+  };
+
+  const handleBooking = async () => {
+    try {
+      // Book the selected seats
+      const booking = await bookTickets(parseInt(scheduleId), selectedSeats);
+  
+      if (!booking || !booking.booking_id) {
+        throw new Error("Booking failed or booking ID is missing.");
+      }
+  
+      alert('Đặt vé thành công!');
+      console.log("Booking successful. Booking ID:", booking.booking_id);
+  
+      // Save bookingID to localStorage for retrieval on the payment page
+      localStorage.setItem('bookingID', booking.booking_id);
+  
+      // Fetch all bookings for the current user by user ID (if needed for logging or further processing)
+      const userID = localStorage.getItem('userID'); // Assuming userID is stored in localStorage after login
+      const userBookings = await fetchBookingsByUserID(userID);
+      console.log("User's Bookings:", userBookings); // Logs all bookings for this user
+  
+      // Navigate to the payment page
+      navigate('/payment');
+    } catch (error) {
+      alert('Booking failed: ' + (error.response?.data?.error || error.message));
+      console.error('Booking error:', error);
     }
   };
- const handleBooking = async () => {
-  try {
-    const booking = await bookTickets(parseInt(scheduleId), selectedSeats);
-    
-    if (!booking || !booking.booking_id) {
-      throw new Error("Booking failed or booking ID is missing.");
-    }
-
-    alert('Đặt vé thành công!');
-    console.log("Booking successful. Booking ID:", booking.booking_id);
-    localStorage.setItem('bookingID', booking.booking_id);
-
-    await Promise.all(selectedSeats.map(seatID => createTicket({
-      seatID,
-      bookingID: booking.booking_id,
-      
-      fare: schedule.fare,
-      qrCode: `QR_${booking.booking_id}_${seatID}`
-    })));
-    console.log("Booking ID:", booking.booking_id); // This should log a valid booking ID
-    navigate('/payment');
-  } catch (error) {
-    alert('Booking failed: ' + (error.response?.data?.error || error.message));
-  }
-}
-
+  
+  
+  
 
   if (loadingSeats || loadingSchedule) {
     return <div>Loading data...</div>;

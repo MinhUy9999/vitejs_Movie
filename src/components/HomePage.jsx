@@ -4,27 +4,20 @@ import MovieList from './MovieList';
 import Chat from './Chat';
 
 function HomePage() {
-  const [bookingComplete, setBookingComplete] = useState(false); // Trạng thái để kiểm tra nếu đã có booking
   const name = localStorage.getItem('name') || 'User';
   const role = localStorage.getItem('role') || 'user';
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Kiểm tra nếu có bookingID trong localStorage
-    const bookingID = localStorage.getItem('bookingID');
-    setBookingComplete(!!bookingID); // Đặt thành true nếu có bookingID
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('name');
     localStorage.removeItem('role');
-    localStorage.removeItem('bookingID'); // Xóa bookingID khi logout
+    localStorage.removeItem('bookingID'); // Remove bookingID on logout
     navigate('/login');
   };
 
   const goToPayment = () => {
-    navigate('/payment'); // Điều hướng đến trang thanh toán
+    navigate('/payment'); // Navigate to the payment page
   };
 
   return (
@@ -43,15 +36,13 @@ function HomePage() {
           </Link>
         )}
 
-        {/* Nút điều hướng đến trang thanh toán */}
-        {bookingComplete && (
-          <button
-            onClick={goToPayment}
-            className="ml-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Đi đến trang thanh toán
-          </button>
-        )}
+        {/* Payment page button, always visible */}
+        <button
+          onClick={goToPayment}
+          className="ml-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Đi đến trang thanh toán
+        </button>
 
         {role === 'admin' ? (
           <button

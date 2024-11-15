@@ -23,7 +23,7 @@ const TheaterList = () => {
         const loadTheaters = async () => {
             try {
                 const data = await fetchTheaters(movieId);
-                setTheaters(data.theaters);
+                setTheaters(data.theaters || []); // Ensure theaters is an array
             } catch (err) {
                 setError('Failed to fetch theaters.');
             } finally {
@@ -41,7 +41,7 @@ const TheaterList = () => {
         setSchedules([]);
         try {
             const data = await fetchRoomsByTheaterID(theaterID);
-            setRooms(data.rooms);
+            setRooms(data || []); // Ensure rooms is an array
         } catch (err) {
             setError('Failed to fetch rooms.');
         } finally {
@@ -56,7 +56,7 @@ const TheaterList = () => {
         setSchedules([]);
         try {
             const data = await fetchScreensByRoomID(roomID);
-            setScreens(data.screens);
+            setScreens(data.screens || []); // Ensure screens is an array
         } catch (err) {
             setError('Failed to fetch screens.');
         } finally {
@@ -70,7 +70,7 @@ const TheaterList = () => {
         setSchedules([]);
         try {
             const data = await fetchSchedulesByScreenID(screenID);
-            setSchedules(data);
+            setSchedules(data || []); // Ensure schedules is an array
         } catch (err) {
             setError('Failed to fetch schedules.');
         } finally {
@@ -95,7 +95,7 @@ const TheaterList = () => {
             <h2 className="text-3xl font-bold text-black mb-6">DANH SÁCH RẠP</h2>
 
             <div className="space-y-4">
-                {theaters.map((theater) => (
+                {(theaters || []).map((theater) => (
                     <div
                         key={theater.theater_id}
                         className="bg-purple-700 rounded-lg p-4 text-white"
@@ -119,7 +119,7 @@ const TheaterList = () => {
                             <div className="mt-4">
                                 <div className="mb-2 text-lg font-semibold">Phòng chiếu</div>
                                 <div className="flex space-x-2">
-                                    {rooms.map((room) => (
+                                    {(rooms || []).map((room) => (
                                         <button
                                             key={room.room_id}
                                             onClick={() => handleRoomClick(room.room_id)}
@@ -136,7 +136,7 @@ const TheaterList = () => {
                                             Màn hình chiếu
                                         </div>
                                         <div className="flex space-x-2">
-                                            {screens.map((screen) => (
+                                            {(screens || []).map((screen) => (
                                                 <button
                                                     key={screen.screen_id}
                                                     onClick={() => handleScreenClick(screen.screen_id)}
@@ -149,13 +149,13 @@ const TheaterList = () => {
                                     </>
                                 )}
 
-                                {selectedScreen && schedules.length > 0 && (
+                                {selectedScreen && (schedules || []).length > 0 && (
                                     <>
                                         <div className="mt-4 mb-2 text-lg font-semibold">
                                             Lịch chiếu
                                         </div>
                                         <div className="grid grid-cols-4 gap-2">
-                                            {schedules.map((schedule) => (
+                                            {(schedules || []).map((schedule) => (
                                                 <button
                                                     key={schedule.scheduleID}
                                                     onClick={() => handleScheduleClick(schedule.scheduleID)}
